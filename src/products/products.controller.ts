@@ -33,7 +33,20 @@ import {
   API_DESC_GET_VIEW_PRODUCT,
   API_DESC_SEARCH_PRODUCTS_BY_NAME
 } from './products.controller.api.desc';
+import { 
+  DataSource 
+} from 'typeorm';
+@Controller('api/crystals')
+export class CrystalsSearchController {
+  constructor(private readonly dataSource: DataSource) {}
 
+  // VULNERABLE: user input is concatenated straight into the SQL string
+  @Get('search')
+  async search(@Query('q') q: string) {
+    const sql = `SELECT * FROM products WHERE name ILIKE '%${q}%'`;
+    return this.dataSource.query(sql);
+  }
+}
 @Controller('/api/products')
 @ApiTags('Products controller')
 export class ProductsController {
